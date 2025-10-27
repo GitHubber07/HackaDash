@@ -1,122 +1,123 @@
 import React, { useState } from 'react';
-import Icon from '../components/Icon';
 
-// Renders a form for participants to register their own team.
-// Receives props from App.js
-const RegisterTeamPage = ({ userId, teams, onCreateTeam, setCurrentPage }) => {
-    
-    // Local state for the "Create Team" form
+// Form for participants to register their own team.
+const RegisterTeamPage = ({ onRegister, teams }) => { // Changed onCreateTeam to onRegister prop
     const [teamName, setTeamName] = useState('');
-    const [teamDomain, setTeamDomain] = useState('Web');
-    const [teamMembers, setTeamMembers] = useState('');
-    const [error, setError] = useState(null); // State for error messages
-    const [success, setSuccess] = useState(null); // State for success message
+    const [domain, setDomain] = useState('Web'); // Default domain
+    const [members, setMembers] = useState('');
+    const [error, setError] = useState('');     // State for displaying errors
+    const [success, setSuccess] = useState('');   // State for success message
 
-    // Handles submitting the create team form
+    // Handles the form submission
     const handleCreateTeam = (e) => {
-        e.preventDefault();
-        setError(null); // Clear previous errors
-        setSuccess(null); // Clear previous success
+        e.preventDefault(); // Prevent default form submission reload
+        setError(''); // Clear previous errors
+        setSuccess(''); // Clear previous success messages
 
-        if (!teamName || !teamDomain || !teamMembers) {
+        // Basic validation
+        if (!teamName.trim() || !domain || !members.trim()) {
             setError('All fields are required.');
             return;
         }
-        
-        // Check if a team with this name already exists (case-insensitive)
-        const nameExists = teams.some(team => team.name.toLowerCase() === teamName.toLowerCase());
-        if (nameExists) {
-            setError(`A team with the name "${teamName}" already exists.`);
+
+         // Check if team name already exists (case-insensitive)
+        if (teams && teams.some(team => team.name.toLowerCase() === teamName.trim().toLowerCase())) {
+            setError(`Team name "${teamName.trim()}" already exists. Please choose another name.`);
             return;
         }
 
-        // Convert comma-separated string to an array of names
-        const membersArray = teamMembers.split(',').map(m => m.trim()).filter(Boolean);
-        if (membersArray.length === 0) {
-            setError('You must add at least one team member.');
-            return;
-        }
+        // Call the function passed from App.js to add the team to Firestore
+        onRegister({ // <<<=== CHANGED from onCreateTeam to onRegister
+            name: teamName.trim(),
+            domain: domain,
+            members: members.trim(),
+        });
 
-        // Call the onCreateTeam function from App.js
-        onCreateTeam(teamName, teamDomain, membersArray);
-        
-        // Show success and clear the form
-        setSuccess(`Success! Team "${teamName}" has been registered.`);
+        // Set success message and clear the form
+        setSuccess(`Team "${teamName.trim()}" registered successfully!`);
         setTeamName('');
-        setTeamDomain('Web');
-        setTeamMembers('');
-
-        // Optional: Redirect to the teams page after a short delay
-        setTimeout(() => {
-            setCurrentPage('teams');
-        }, 2000);
+        setDomain('Web'); // Reset domain to default
+        setMembers('');
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-                <h2 className="text-2xl font-bold p-4 border-b border-gray-200 dark:border-gray-700">Register Your Team</h2>
-                
-                <form onSubmit={handleCreateTeam} className="p-4 space-y-4">
-                    {/* --- Success Message --- */}
-                    {success && (
-                        <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200">
-                            {success}
-                        </div>
-                    )}
-                    {/* --- Error Message --- */}
-                    {error && (
-                        <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-800 dark:text-red-200">
-                            {error}
-                        </div>
-                    )}
+        <div className="max-w-md mx-auto mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold mb-6 text-center">Register Your Team</h1>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="team-name">Team Name</label>
-                        <input 
-                            id="team-name" 
-                            type="text" 
-                            value={teamName} 
-                            onChange={(e) => setTeamName(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700" 
-                            required 
-                        />
+            <form onSubmit={handleCreateTeam} className="space-y-4">
+                {/* Display Error Message */}
+                {error && (
+                    <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-300 border border-red-300 dark:border-red-600" role="alert">
+                        {error}
                     </div>
-                     <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="team-domain">Domain</label>
-                        <select 
-                            id="team-domain" 
-                            value={teamDomain} 
-                            onChange={(e) => setTeamDomain(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700" 
-                            required 
-                        >
-                            <option value="Web">Web</option>
-                            <option value="ML">ML</option>
-                            <option value="Design">Design</option>
-                        </select>
+                )}
+                 {/* Display Success Message */}
+                {success && (
+                    <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-300 border border-green-300 dark:border-green-600" role="alert">
+                        {success}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="team-members">Members (comma-separated)</label>
-                        <input 
-                            id="team-members" 
-                            type="text" 
-                            value={teamMembers} 
-                            onChange={(e) => setTeamMembers(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-                            placeholder="Alice, Bob, Charlie" 
-                            required 
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex justify-center items-center gap-2"
+                )}
+
+                {/* Team Name Input */}
+                <div>
+                    <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Team Name
+                    </label>
+                    <input
+                        type="text"
+                        id="teamName"
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                </div>
+
+                {/* Domain Selection */}
+                <div>
+                    <label htmlFor="domain" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Domain
+                    </label>
+                    <select
+                        id="domain"
+                        value={domain}
+                        onChange={(e) => setDomain(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
-                        <Icon name="Plus" size={18} />
+                        <option value="Web">Web Development</option>
+                        <option value="ML">Machine Learning</option>
+                        <option value="Design">UI/UX Design</option>
+                        {/* Add other domains if needed */}
+                    </select>
+                </div>
+
+                {/* Members Input */}
+                <div>
+                    <label htmlFor="members" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Members (comma-separated)
+                    </label>
+                    <input
+                        type="text"
+                        id="members"
+                        value={members}
+                        onChange={(e) => setMembers(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        placeholder="e.g., Alice, Bob, Charlie"
+                    />
+                </div>
+
+                {/* Submit Button */}
+                <div>
+                    <button
+                        type="submit"
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    >
                         Register Team
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     );
 };

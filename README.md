@@ -1,67 +1,136 @@
 Hackathon Real-Time Dashboard
 
-This is a simple, clean, and real-time dashboard for a hackathon.
+A dynamic web application built with React and Firebase to display team registrations, live rankings, and announcements for a hackathon event in real-time. Includes role-based access for organizers and participants.
 
-It uses React for the frontend and Firebase (Firestore) for the real-time database and authentication.
+Features
 
-Core Features
+Real-Time Leaderboard: View team rankings based on scores, updated live without page reloads. Filter leaderboard by domain (Web, ML, Design).
 
-Real-Time Leaderboard: Scores update live for everyone.
+Team Listings: Browse all registered teams and their details. Filter teams by domain.
 
-Simple Admin Panel: Organizers can update scores and post announcements.
+Team Registration: Logged-in participants can register their own teams.
 
-Role-Based Access: A simple demo toggle lets you "Become an Organizer" to see the Admin panel.
+Announcements: View event announcements, posted by organizers. Includes live notification toasts for new posts.
 
-Clean UI: Styled with Tailwind CSS, including a Dark/Light mode toggle.
+User Authentication: Secure sign-up and sign-in using Email/Password via Firebase Authentication.
 
-How to Run This Project
+Role-Based Access:
 
-Set up Firebase:
+Participants: Can view dashboard, teams, announcements, rules, and register their team.
 
-Go to the Firebase Console and create a new project.
+Organizers (Admin): Have participant access plus a dedicated Admin Panel to post/delete announcements and update team scores.
 
-Add a Web App to your project.
+Theme Customization: Toggle between Light and Dark modes.
 
-Copy the firebaseConfig object (it has your API keys).
+Responsive Design: Adapts to various screen sizes, including mobile devices.
 
-Create .env.local file:
+Technology Stack
 
-In the project's root folder, create a file named .env.local
+Frontend: React (using Create React App)
 
-Paste your Firebase keys into it like this:
+Backend & Database: Firebase (Authentication, Firestore for real-time data)
 
-REACT_APP_FIREBASE_API_KEY="your-api-key"
-REACT_APP_FIREBASE_AUTH_DOMAIN="your-auth-domain"
-REACT_APP_FIREBASE_PROJECT_ID="your-project-id"
-REACT_APP_FIREBASE_STORAGE_BUCKET="your-storage-bucket"
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID="your-sender-id"
-REACT_APP_FIREBASE_APP_ID="your-app-id"
+Styling: Tailwind CSS
 
-# This is a unique name for your app's data in the database
+Icons: Heroicons (via inline SVGs)
+
+Setup Instructions
+
+Follow these steps to get the project running locally:
+
+Clone the Repository:
+
+git clone <your-repository-url>
+cd hackathon-dashboard
+
+
+Install Dependencies:
+
+npm install
+
+
+Set Up Firebase Project:
+
+Go to the Firebase Console.
+
+Create a new project (or use an existing one).
+
+Add a Web app to your project.
+
+Copy the firebaseConfig object provided during setup.
+
+Go to Authentication > Sign-in method and enable the Email/Password provider.
+
+Go to Firestore Database > Create database. Start in test mode initially (we'll add rules later). Choose a location.
+
+Create Environment File:
+
+In the root directory of the project (hackathon-dashboard/), create a file named .env.local.
+
+Paste your Firebase configuration keys into this file, formatted like below:
+
+REACT_APP_FIREBASE_API_KEY="YOUR_API_KEY"
+REACT_APP_FIREBASE_AUTH_DOMAIN="YOUR_AUTH_DOMAIN"
+REACT_APP_FIREBASE_PROJECT_ID="YOUR_PROJECT_ID"
+REACT_APP_FIREBASE_STORAGE_BUCKET="YOUR_STORAGE_BUCKET"
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID="YOUR_MESSAGING_SENDER_ID"
+REACT_APP_FIREBASE_APP_ID="YOUR_APP_ID"
+
+# This ID is used to namespace data in Firestore. Keep it consistent.
 REACT_APP_HACKATHON_APP_ID="hackathon-demo-2025"
 
+
+Replace "YOUR_..." with your actual Firebase project keys. You can keep REACT_APP_HACKATHON_APP_ID as is or change it if desired (ensure it matches the document name used in Firestore).
 
 Set Up Firestore Rules:
 
 In the Firebase Console, go to Firestore Database > Rules.
 
-Paste in these rules to allow public access only to your app's data. This is great for a demo.
+Replace the default rules with the following to allow public reads and writes only to the specific data path used by the app:
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Allow public read/write access ONLY to our hackathon's data path
     match /artifacts/{appId}/public/data/{document=**} {
-      allow read, write: if true;
+      allow read, write: if true; // For demo purposes. Secure appropriately for production.
     }
+    // Add other rules if needed for different paths
   }
 }
 
 
-Install & Run:
+Click Publish.
+(Note: For a production app, you would implement more secure rules, e.g., allow read: if request.auth != null; and more granular write rules based on roles).
 
-Open your terminal and run: npm install
+Run the Application:
 
-Then, run: npm start
+npm start
 
-Your project will open at http://localhost:3000.
+
+The app should open automatically in your browser at http://localhost:3000.
+
+How to Grant Admin (Organizer) Role
+
+Admin access is granted by adding a user's Firebase Authentication User UID as a document ID within a specific Firestore collection.
+
+Sign Up: Create an account in the app using the Email/Password sign-up form.
+
+Get User UID: Go to your Firebase Console > Authentication > Users tab. Find the user you just created and copy their User UID.
+
+Add to Firestore:
+
+Go to Firebase Console > Firestore Database.
+
+Navigate or create the following nested collection path:
+artifacts / {Your REACT_APP_HACKATHON_APP_ID value} / public / data / organizers
+
+Inside the organizers collection, click "Add document".
+
+Set the Document ID to be the User UID you copied.
+
+Add a field (e.g., Field: role, Type: string, Value: organizer). The existence of the document with the User UID as its ID grants the role.
+
+Click Save.
+
+Verify: Refresh the app (or wait a few seconds). If you are logged in with that user account, the "Admin" link should now appear in the header.

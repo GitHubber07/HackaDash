@@ -1,151 +1,201 @@
 import React, { useState } from 'react';
-import Icon from '../components/Icon';
+import LoadingSpinner from '../components/LoadingSpinner';
+import Icon from '../components/Icon'; // Import Icon component
 
-// Renders the admin panel with forms for managing the hackathon.
-// Receives data (teams) and handler functions (onAddAnnouncement, etc.) as props from App.js.
-const AdminPanel = ({ 
-    teams, 
-    announcements, 
-    onAddAnnouncement, 
-    onUpdateScore, 
-    onDeleteAnnouncement 
+// Admin panel for organizers to manage announcements and scores.
+const AdminPanel = ({
+    teams,
+    announcements,
+    onPostAnnouncement,
+    onUpdateScore,
+    onDeleteAnnouncement,
+    onDeleteTeam, // <<<=== NEW PROP
+    isLoading
 }) => {
-    
-    // Local state for the "Post Announcement" form
+    // State for announcement form
     const [annTitle, setAnnTitle] = useState('');
     const [annContent, setAnnContent] = useState('');
-    
-    // Local state for the "Update Score" form
-    const [selectedTeam, setSelectedTeam] = useState('');
-    const [newScore, setNewScore] = useState(0);
 
-    // --- Form Submit Handlers ---
+    // State for score update form
+    const [selectedTeamId, setSelectedTeamId] = useState('');
+    const [newScore, setNewScore] = useState('');
 
-    // Handles submitting the new announcement form
-    const handleAddAnnouncement = (e) => {
-        e.preventDefault(); // Prevent page reload
-        if (!annTitle || !annContent) return; // Basic validation
-        onAddAnnouncement(annTitle, annContent); // Call App.js function
-        // Reset form fields
-        setAnnTitle('');
-        setAnnContent('');
-    };
-
-    // Handles submitting the update score form
-    const handleUpdateScore = (e) => {
+    // Handle posting a new announcement
+    const handlePostSubmit = (e) => {
         e.preventDefault();
-        if (!selectedTeam || newScore < 0) return;
-        onUpdateScore(selectedTeam, parseInt(newScore, 10));
-        setSelectedTeam('');
-        setNewScore(0);
+        if (!annTitle.trim() || !annContent.trim()) {
+            alert('Please enter both title and content for the announcement.'); // Simple validation
+            return;
+        }
+        onPostAnnouncement(annTitle, annContent);
+        setAnnTitle(''); // Clear form
+        setAnnContent(''); // Clear form
     };
+
+    // Handle updating a team's score
+    const handleScoreSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedTeamId || newScore.trim() === '') {
+            alert('Please select a team and enter a new score.'); // Simple validation
+            return;
+        }
+        onUpdateScore(selectedTeamId, newScore);
+        // Optionally clear form:
+        // setSelectedTeamId('');
+        // setNewScore('');
+    };
+
+     // Handle deleting an announcement
+    const handleDeleteAnnClick = (id) => {
+        // Simple confirmation before deleting
+        if (window.confirm('Are you sure you want to delete this announcement?')) {
+            onDeleteAnnouncement(id);
+        }
+    };
+
+    // Handle deleting a team 
+    const handleDeleteTeamClick = (id) => {
+         if (window.confirm('Are you sure you want to delete this team? This action cannot be undone.')) {
+            onDeleteTeam(id);
+        }
+    };
+
+    // Effect to set default selected team when teams load
+    // Ensures the dropdown isn't blank initially if teams exist
+    React.useEffect(() => {
+        if (!selectedTeamId && teams && teams.length > 0) {
+            setSelectedTeamId(teams[0].id);
+        }
+    }, [teams, selectedTeamId]);
+
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            {/* --- Post Announcement Form --- */}
-            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-                <h2 className="text-2xl font-bold p-4 border-b border-gray-200 dark:border-gray-700">Post Announcement</h2>
-                <form onSubmit={handleAddAnnouncement} className="p-4 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="ann-title">Title</label>
-                        <input
-                            id="ann-title"
-                            type="text"
-                            value={annTitle}
-                            onChange={(e) => setAnnTitle(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="ann-content">Content</label>
-                        <textarea
-                            id="ann-content"
-                            value={annContent}
-                            onChange={(e) => setAnnContent(e.target.value)}
-                            rows="4"
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex justify-center items-center gap-2">
-                        <Icon name="Send" size={18} />
-                        Post
-                    </button>
-                </form>
+        <div className="space-y-8 p-4 sm:p-6">
+            <h1 className="text-3xl font-bold mb-6 text-center">Admin Panel</h1>
 
-                {/* --- Manage Announcements --- */}
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                    <h3 className="text-lg font-semibold mb-2">Existing Announcements</h3>
-                    <ul className="space-y-2 max-h-60 overflow-y-auto">
-                        {/* Show message if no announcements */}
-                        {announcements.length === 0 && (
-                            <li className="text-gray-500 dark:text-gray-400 text-sm p-2">
-                                No announcements to manage.
-                            </li>
-                        )}
-                        {/* List all announcements */}
-                        {announcements.map(ann => (
-                            <li key={ann.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <div className="flex-1 overflow-hidden">
-                                    <span className="font-medium block truncate">{ann.title}</span>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{ann.content}</p>
-                                </div>
-                                <button 
-                                    onClick={() => onDeleteAnnouncement(ann.id)} // Call delete function from App.js
-                                    className="p-2 ml-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 rounded-full flex-shrink-0"
+            {isLoading ? (
+                <LoadingSpinner />
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    {/* Announcements Section */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 space-y-6">
+                        <h2 className="text-xl font-semibold mb-4">Manage Announcements</h2>
+
+                        {/* Post Announcement Form */}
+                        <form onSubmit={handlePostSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="annTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                                <input
+                                    type="text"
+                                    id="annTitle"
+                                    value={annTitle}
+                                    onChange={(e) => setAnnTitle(e.target.value)}
+                                    required
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="annContent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
+                                <textarea
+                                    id="annContent"
+                                    rows="4"
+                                    value={annContent}
+                                    onChange={(e) => setAnnContent(e.target.value)}
+                                    required
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700"
+                                ></textarea>
+                            </div>
+                            <button type="submit" className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                Post Announcement
+                            </button>
+                        </form>
+
+                        {/* Existing Announcements List (for deletion) */}
+                        <div>
+                             <h3 className="text-lg font-medium mb-3 mt-6">Existing Announcements</h3>
+                            <ul className="space-y-2 max-h-60 overflow-y-auto border dark:border-gray-600 rounded p-3">
+                                {announcements.length > 0 ? announcements.map(ann => (
+                                    <li key={ann.id} className="flex justify-between items-center text-sm p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <span>{ann.title}</span>
+                                        <button
+                                            onClick={() => handleDeleteAnnClick(ann.id)}
+                                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                                            title="Delete Announcement"
+                                        >
+                                            <Icon name="trash" />
+                                        </button>
+                                    </li>
+                                )) : <li className="text-gray-500 dark:text-gray-400">No announcements yet.</li>}
+                            </ul>
+                        </div>
+                    </div>
+
+                     {/* Teams Section */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 space-y-6">
+                        <h2 className="text-xl font-semibold mb-4">Manage Teams</h2>
+
+                         {/* Update Score Form */}
+                        <form onSubmit={handleScoreSubmit} className="space-y-4 border-b dark:border-gray-600 pb-6">
+                             <h3 className="text-lg font-medium">Update Score</h3>
+                            <div>
+                                <label htmlFor="teamSelect" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Team</label>
+                                <select
+                                    id="teamSelect"
+                                    value={selectedTeamId}
+                                    onChange={(e) => setSelectedTeamId(e.target.value)}
+                                    required
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700"
                                 >
-                                    <Icon name="Trash2" size={16} />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                                    {/* Default option if no teams */}
+                                    {teams.length === 0 && <option value="" disabled>No teams available</option>}
+                                    {/* Map through teams to create options */}
+                                    {teams.map(team => (
+                                        <option key={team.id} value={team.id}>
+                                            {team.name} (Current: {team.score})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="newScore" className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Score</label>
+                                <input
+                                    type="number"
+                                    id="newScore"
+                                    value={newScore}
+                                    onChange={(e) => setNewScore(e.target.value)}
+                                    required
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700"
+                                    placeholder="Enter new score"
+                                />
+                            </div>
+                            <button type="submit" className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                                Update Score
+                            </button>
+                        </form>
+
+                        {/*  Existing Teams List (for deletion)*/}
+                        <div>
+                             <h3 className="text-lg font-medium mb-3 mt-6">Delete Teams</h3>
+                            <ul className="space-y-2 max-h-60 overflow-y-auto border dark:border-gray-600 rounded p-3">
+                                {teams.length > 0 ? teams.map(team => (
+                                    <li key={team.id} className="flex justify-between items-center text-sm p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <span>{team.name} ({team.domain})</span>
+                                        <button
+                                            onClick={() => handleDeleteTeamClick(team.id)}
+                                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                                            title="Delete Team"
+                                        >
+                                            <Icon name="trash" />
+                                        </button>
+                                    </li>
+                                )) : <li className="text-gray-500 dark:text-gray-400">No teams registered yet.</li>}
+                            </ul>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
-
-            {/* --- Update Scores Form --- */}
-            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-                <h2 className="text-2xl font-bold p-4 border-b border-gray-200 dark:border-gray-700">Update Team Score</h2>
-                <form onSubmit={handleUpdateScore} className="p-4 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="team-select">Team</label>
-                        <select
-                            id="team-select"
-                            value={selectedTeam}
-                            onChange={(e) => setSelectedTeam(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-                            required
-                        >
-                            <option value="">Select a team</option>
-                            {/* Populate dropdown with teams from props */}
-                            {teams.map(team => (
-                                <option key={team.id} value={team.id}>{team.name} (Current: {team.score})</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1" htmlFor="new-score">New Score</label>
-                        <input
-                            id="new-score"
-                            type="number"
-                            value={newScore}
-                            onChange={(e) => setNewScore(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700">
-                        Update Score
-                    </button>
-                </form>
-            </div>
-            
-            {/* REMOVED: The "Manage Teams" (Create/Delete) form.
-                This is now handled by participants on the new "Register Team" page.
-                Admins can only update scores.
-            */}
-
+            )}
         </div>
     );
 };

@@ -1,20 +1,35 @@
-// --- Firebase App Initialization ---
 import { initializeApp } from 'firebase/app';
-// --- Firestore Database ---
-import { getFirestore, collection, query, onSnapshot, orderBy, serverTimestamp, doc, addDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore'; 
-// --- Authentication ---
-import { 
-    getAuth, 
-    onAuthStateChanged, 
-    // --- NEW: Email/Password Auth functions ---
+import {
+    getAuth,
+    onAuthStateChanged,
+    signInAnonymously, // Keep for initial load/fallback
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    updateProfile // To set display name after signup
+    updateProfile, // Needed to set display name
+    // GoogleAuthProvider, // No longer needed
+    // signInWithPopup    // No longer needed
 } from 'firebase/auth';
-// REMOVED: GoogleAuthProvider, signInWithPopup, signInAnonymously
+import {
+    getFirestore,
+    collection,
+    doc,
+    addDoc,
+    setDoc, // Needed for setting organizer role
+    getDoc, // Needed for checking organizer role
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    limit, // <<<=== ADD THIS IMPORT
+    serverTimestamp
+} from 'firebase/firestore';
 
-// --- Environment Variables ---
+// --- Firebase Configuration ---
+// Your web app's Firebase configuration
+// IMPORTANT: Replace with your actual config from Firebase Console
+// Store these in a .env.local file (see README)
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -23,29 +38,42 @@ const firebaseConfig = {
     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
+
+// --- Initialize Firebase ---
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// --- Hackathon App ID ---
+// Custom ID for namespacing data in Firestore (from .env.local)
 const hackathonAppId = process.env.REACT_APP_HACKATHON_APP_ID || 'default-hackathon-app';
 
-// Initialize Firebase App
-const app = initializeApp(firebaseConfig);
-// Initialize Firestore Database service
-const db = getFirestore(app);
-// Initialize Firebase Authentication service
-const auth = getAuth(app);
 
 // --- Exports ---
-export { 
-    db, 
-    auth, 
-    hackathonAppId, 
+// Export the initialized services and necessary functions
+export {
+    auth,
+    db,
+    hackathonAppId, // Export the app ID for constructing paths
     // Firestore functions
-    collection, query, onSnapshot, orderBy, serverTimestamp, 
-    doc, addDoc, updateDoc, deleteDoc, setDoc,
+    collection,
+    doc,
+    addDoc,
+    setDoc,
+    getDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    limit, 
+    serverTimestamp,
     // Auth functions
-    onAuthStateChanged, 
-    // --- NEW Exports ---
+    onAuthStateChanged,
+    signInAnonymously, // Keep for potential fallback or initial state
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    updateProfile
+    updateProfile,
 };
 

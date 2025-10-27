@@ -1,38 +1,42 @@
 import React from 'react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-// Renders the list of announcements.
-// Receives 'announcements' and 'isLoading' props from App.js.
+// Displays a list of announcements, newest first.
 const AnnouncementsPage = ({ announcements, isLoading }) => {
 
-    if (isLoading) return <LoadingSpinner />;
+    // Show loading spinner if data is loading
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
 
     return (
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold p-4 border-b border-gray-200 dark:border-gray-700">Announcements</h2>
-            <div className="p-4 space-y-4">
-                
-                {/* Show a message if the list is empty */}
-                {announcements.length === 0 && (
-                     <p className="p-4 text-center text-gray-500">No announcements have been posted yet.</p>
-                )}
-                
-                {/* Map over the announcements array and render a card for each */}
-                {announcements.map(ann => (
-                    <div 
-                        key={ann.id} 
-                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-                    >
-                        <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400">{ann.title}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                            {/* Check if timestamp exists before converting */}
-                            {ann.timestamp ? new Date(ann.timestamp.toDate()).toLocaleString() : 'Just now'}
-                        </p> 
-                        {/* whitespace-pre-wrap respects newlines in the content */}
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{ann.content}</p>
-                    </div>
-                ))}
-            </div>
+        <div>
+            <h1 className="text-3xl font-bold mb-6 text-center">Announcements</h1>
+
+            {announcements.length > 0 ? (
+                <div className="space-y-4 max-w-2xl mx-auto">
+                    {announcements.map((ann) => (
+                        <div
+                            key={ann.id}
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700"
+                        >
+                            <h2 className="text-lg font-semibold mb-1">{ann.title}</h2>
+                            {/* Safely check if timestamp exists and has toDate before calling */}
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                Posted on: {ann.timestamp && typeof ann.timestamp.toDate === 'function'
+                                    ? ann.timestamp.toDate().toLocaleString()
+                                    : 'Date unavailable'}
+                            </p>
+                            {/* Render content, handling potential newlines */}
+                             <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                                {ann.content}
+                             </p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500 dark:text-gray-400">No announcements posted yet.</p>
+            )}
         </div>
     );
 };
