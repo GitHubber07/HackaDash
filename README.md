@@ -1,6 +1,6 @@
 # Hackathon Real-Time Dashboard
 
-🔗 **Live Demo:** [View Deployed App](https://your-vercel-deployment-url.vercel.app)
+🔗 **Live Demo:** [View Deployed App](https://hacka-dash.vercel.app/)
 
 A dynamic web application built with React and Firebase to display team registrations, live rankings, and announcements for a hackathon event in real-time. Includes role-based access for organizers and participants.
 
