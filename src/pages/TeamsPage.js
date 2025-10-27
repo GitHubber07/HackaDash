@@ -69,8 +69,6 @@ const TeamsPage = ({ teams, isLoading }) => {
                                     <span className="font-medium">Members:</span> {team.members}
                                 </p>
                             </div>
-                            {/* Score could be optionally added back here if desired */}
-                            {/* <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Score: {team.score}</p> */}
                         </div>
                     ))}
                 </div>

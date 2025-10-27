@@ -1,7 +1,6 @@
 import React from 'react';
 
 // Simple SVG Icon component
-// Add more icons here as needed
 const icons = {
   // --- Heroicons (MIT License) ---
   // https://heroicons.com/
@@ -27,19 +26,19 @@ const icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
     </svg>
   ),
-   x: ( // Lowercase 'x' to avoid conflicts
+   x: ( 
      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
     </svg>
   ),
 
-  // --- Newly Added Icons (Outline Style) ---
+  // Added Icons (Outline Style) 
   trophy: (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-1">
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-4.5A3.375 3.375 0 0 0 12.75 9.75H11.25a3.375 3.375 0 0 0-3.5 3.5v4.5m9 0h-9" />
     </svg>
   ),
-  layoutdashboard: ( // Note: lowercase for lookup
+  layoutdashboard: ( // lowercase for lookup
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-1">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
     </svg>
@@ -69,7 +68,7 @@ const icons = {
         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.5 21.75c-2.676 0-5.216-.584-7.499-1.636Z" />
     </svg>
   ),
-   menu: ( // Added Menu icon (often used for mobile nav toggles)
+   menu: ( // Added Menu icon (used for mobile nav toggles)
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
     </svg>
@@ -78,7 +77,6 @@ const icons = {
 };
 
 const Icon = ({ name, className = '', size }) => {
-    // Standardize name to lowercase for reliable lookup
     const lowerCaseName = name ? name.toLowerCase() : '';
     const SvgIcon = icons[lowerCaseName];
 
@@ -91,8 +89,6 @@ const Icon = ({ name, className = '', size }) => {
     const defaultSizeClass = SvgIcon.props.className?.match(/(w-\d+|h-\d+)/g)?.join(' ') || 'w-5 h-5';
     const sizeClass = size ? `w-${size} h-${size}` : '';
 
-    // Clone the SVG element to add the custom className and potentially size
-    // Combine existing className from SVG definition, passed className, and sizeClass
     const combinedClassName = [
         SvgIcon.props.className?.replace(/(w-\d+|h-\d+)/g, ''), // Remove existing size classes from definition
         className,              // Class passed via props
@@ -100,7 +96,7 @@ const Icon = ({ name, className = '', size }) => {
     ].filter(Boolean).join(' '); // Filter out empty strings and join
 
     return React.cloneElement(SvgIcon, {
-        className: combinedClassName.trim() || undefined // Use undefined if empty to avoid empty class attribute
+        className: combinedClassName.trim() || undefined 
     });
 };
 

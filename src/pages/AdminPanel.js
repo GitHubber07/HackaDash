@@ -9,7 +9,7 @@ const AdminPanel = ({
     onPostAnnouncement,
     onUpdateScore,
     onDeleteAnnouncement,
-    onDeleteTeam, // <<<=== NEW PROP
+    onDeleteTeam, 
     isLoading
 }) => {
     // State for announcement form
@@ -28,8 +28,8 @@ const AdminPanel = ({
             return;
         }
         onPostAnnouncement(annTitle, annContent);
-        setAnnTitle(''); // Clear form
-        setAnnContent(''); // Clear form
+        setAnnTitle(''); 
+        setAnnContent(''); 
     };
 
     // Handle updating a team's score
@@ -40,9 +40,6 @@ const AdminPanel = ({
             return;
         }
         onUpdateScore(selectedTeamId, newScore);
-        // Optionally clear form:
-        // setSelectedTeamId('');
-        // setNewScore('');
     };
 
      // Handle deleting an announcement

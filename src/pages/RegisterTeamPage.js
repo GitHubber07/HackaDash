@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 
 // Form for participants to register their own team.
-const RegisterTeamPage = ({ onRegister, teams }) => { // Changed onCreateTeam to onRegister prop
+const RegisterTeamPage = ({ onRegister, teams }) => { 
     const [teamName, setTeamName] = useState('');
-    const [domain, setDomain] = useState('Web'); // Default domain
+    const [domain, setDomain] = useState('Web'); 
     const [members, setMembers] = useState('');
-    const [error, setError] = useState('');     // State for displaying errors
-    const [success, setSuccess] = useState('');   // State for success message
-
+    const [error, setError] = useState('');     
+    const [success, setSuccess] = useState('');   
     // Handles the form submission
     const handleCreateTeam = (e) => {
         e.preventDefault(); // Prevent default form submission reload
@@ -27,7 +26,7 @@ const RegisterTeamPage = ({ onRegister, teams }) => { // Changed onCreateTeam to
         }
 
         // Call the function passed from App.js to add the team to Firestore
-        onRegister({ // <<<=== CHANGED from onCreateTeam to onRegister
+        onRegister({ 
             name: teamName.trim(),
             domain: domain,
             members: members.trim(),
@@ -88,7 +87,6 @@ const RegisterTeamPage = ({ onRegister, teams }) => { // Changed onCreateTeam to
                         <option value="Web">Web Development</option>
                         <option value="ML">Machine Learning</option>
                         <option value="Design">UI/UX Design</option>
-                        {/* Add other domains if needed */}
                     </select>
                 </div>
 

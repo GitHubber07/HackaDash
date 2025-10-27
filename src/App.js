@@ -29,7 +29,7 @@ import RulesPage from './pages/RulesPage';
 import RegisterTeamPage from './pages/RegisterTeamPage';
 import AdminPanel from './pages/AdminPanel';
 import NotificationToast from './components/NotificationToast';
-import AuthModal from './components/AuthModal'; // Import the new modal
+import AuthModal from './components/AuthModal'; 
 
 // Main application component.
 function App() {
@@ -176,7 +176,7 @@ function App() {
              setIsLoadingTeams(false);
         });
 
-        // Cleanup function: Unsubscribe when component unmounts
+        //  Unsubscribe when component unmounts
         return () => unsubscribe();
     }, [teamsColPath]); // Re-run effect if collection path changes
 
@@ -230,7 +230,7 @@ function App() {
              setIsLoadingAnnouncements(false);
         });
 
-        // Cleanup: Unsubscribe when component unmounts
+        // Unsubscribe when component unmounts
         return () => unsubscribe();
      // Only re-run if the path changes
     }, [announcementsColPath]);
@@ -242,7 +242,6 @@ function App() {
     const handleAddTeam = async (teamData) => {
         if (!user) {
             console.error("User must be logged in to register a team.");
-            // Optionally: show an error message to the user
             return; // Exit if no user
         }
         try {
@@ -250,7 +249,7 @@ function App() {
                 ...teamData, // name, domain, members
                 score: 0, // Initialize score to 0
                 registeredAt: serverTimestamp(), // Add server timestamp
-                registeredBy: user.uid, // Track who registered (optional)
+                registeredBy: user.uid, // Track who registered 
             });
             console.log('Team added successfully:', teamData.name);
              setCurrentPage('teams'); // Navigate to teams page after registration
@@ -319,14 +318,11 @@ function App() {
     };
 
 
-    // --- Theme Handling ---
-    // <<<=== Ensure toggleTheme function is present ===>>>
     // Toggle between light and dark themes
     const toggleTheme = useCallback(() => {
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     }, []);
 
-    // <<<=== Ensure useEffect for applying theme is present ===>>>
     // Effect to apply the theme class to the body
     useEffect(() => {
         const body = document.body;
@@ -389,7 +385,6 @@ function App() {
     };
 
     // --- Main JSX ---
-    // <<<=== Ensure theme class is applied correctly ===>>>
     return (
         <div className={`min-h-screen ${theme}`}> {/* Apply theme class */}
             <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">

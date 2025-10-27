@@ -7,8 +7,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
     updateProfile, // Needed to set display name
-    // GoogleAuthProvider, // No longer needed
-    // signInWithPopup    // No longer needed
+    // GoogleAuthProvider, 
+    // signInWithPopup   
 } from 'firebase/auth';
 import {
     getFirestore,
@@ -22,7 +22,7 @@ import {
     onSnapshot,
     query,
     orderBy,
-    limit, // <<<=== ADD THIS IMPORT
+    limit, //
     serverTimestamp
 } from 'firebase/firestore';
 

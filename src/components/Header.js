@@ -1,9 +1,9 @@
 import React from 'react';
-import Icon from './Icon'; // Import the Icon component
+import Icon from './Icon'; 
 
 // Reusable navigation link component
 // Only shows an icon if the 'icon' prop is provided
-const NavLink = ({ name, page, currentPage, setCurrentPage, icon = null }) => ( // Default icon to null
+const NavLink = ({ name, page, currentPage, setCurrentPage, icon = null }) => ( 
     <button
         onClick={() => setCurrentPage(page)}
         className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors duration-150 ease-in-out ${

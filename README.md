@@ -149,8 +149,3 @@ Click **Save**.
 
 Refresh the app (or wait a few seconds).
 If you are logged in with that user account, the "Admin" link should now appear in the header.
-
-```
-
-You can paste this entire block directly into your `README.md` — GitHub will automatically render it with perfect Markdown formatting.
-```
