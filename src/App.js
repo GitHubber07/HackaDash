@@ -41,7 +41,8 @@ function App() {
     const [isOrganizer, setIsOrganizer] = useState(false);      // Is the current user an organizer?
     const [isLoadingTeams, setIsLoadingTeams] = useState(true);     // Loading state for teams
     const [isLoadingAnnouncements, setIsLoadingAnnouncements] = useState(true); // Loading state for announcements
-    const [theme, setTheme] = useState('light');                // Current theme ('light' or 'dark')
+    // <<<=== Set initial theme state to 'dark' ===>>>
+    const [theme, setTheme] = useState('dark');                // Current theme ('light' or 'dark')
     const [notification, setNotification] = useState(null);     // Notification message object
     const [showAuthModal, setShowAuthModal] = useState(false); // Controls visibility of the AuthModal
     const [authMode, setAuthMode] = useState('signIn');        // 'signIn' or 'signUp' for the modal
@@ -305,7 +306,7 @@ function App() {
         }
     };
 
-    //Delete a team (for AdminPanel) 
+    // Delete a team (for AdminPanel)
     const handleDeleteTeam = async (teamId) => {
         if (!isOrganizer) return; // Only organizers can delete
         try {
@@ -319,20 +320,22 @@ function App() {
 
 
     // --- Theme Handling ---
-
+    // <<<=== Ensure toggleTheme function is present ===>>>
     // Toggle between light and dark themes
     const toggleTheme = useCallback(() => {
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     }, []);
 
+    // <<<=== Ensure useEffect for applying theme is present ===>>>
     // Effect to apply the theme class to the body
     useEffect(() => {
         const body = document.body;
-        if (theme === 'dark') {
-            body.classList.add('dark');
-        } else {
-            body.classList.remove('dark');
-        }
+        // Clean up previous theme class
+        body.classList.remove('light', 'dark');
+        // Add the current theme class
+        body.classList.add(theme);
+        // Also set on the root html element for Tailwind's dark mode strategy
+        document.documentElement.className = theme;
     }, [theme]); // Re-run when theme changes
 
     // --- Page Rendering Logic ---
@@ -363,7 +366,7 @@ function App() {
                         onPostAnnouncement={handleAddAnnouncement}
                         onUpdateScore={handleUpdateScore}
                         onDeleteAnnouncement={handleDeleteAnnouncement}
-                        onDeleteTeam={handleDeleteTeam} // <<<=== PASS NEW PROP
+                        onDeleteTeam={handleDeleteTeam} // Pass delete handler
                         isLoading={isLoading} // Pass combined loading state
                     />
                 ) : (
@@ -386,10 +389,11 @@ function App() {
     };
 
     // --- Main JSX ---
+    // <<<=== Ensure theme class is applied correctly ===>>>
     return (
-        <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+        <div className={`min-h-screen ${theme}`}> {/* Apply theme class */}
             <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-                {/* Header Component */}
+                {/* Header Component - Pass theme props */}
                 <Header
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
@@ -422,7 +426,7 @@ function App() {
                     )}
                 </div>
 
-                 {/* Authentication Modal */}
+                 {/* Authentication Modal - Pass theme prop */}
                 {showAuthModal && (
                     <AuthModal
                         mode={authMode} // 'signIn' or 'signUp'
